@@ -9,3 +9,6 @@ The script fingerFinder.py includes multiple functions for different tasks, as s
 - Mediapipe
 - Numpy
 </em>
+
+<b><h1>Illustrative screenshot:</h1></b>
+![Alt text](IllustrativeScreenshot.png "Optional Title")
