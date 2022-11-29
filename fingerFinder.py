@@ -2,17 +2,15 @@ import cv2
 import mediapipe as mp
 import numpy
 
-mp_Hands = mp.solutions.hands
-hands = mp_Hands.Hands()
-mpDraw = mp.solutions.drawing_utils
+mpHands = mp.solutions.hands
+hands = mpHands.Hands()
 finger_coord = [(0, 6), (12, 10), (16, 14), (20, 18)]
 thumb_coord = (4, 2)
 
 """Function to get coordinates of fingers"""
-def getHandCoords(multiLandMarks, img):
+def getHandCoords(multiLandmarks, img):
     handList = []
-    for handLms in multiLandMarks:
-        #mpDraw.draw_landmarks(img, handLms, mp_Hands.HAND_CONNECTIONS)
+    for handLms in multiLandmarks:
         for idx, lm in enumerate(handLms.landmark):
             h, w, c = img.shape
             cx, cy = int(lm.x * w), int(lm.y * h)
@@ -42,13 +40,13 @@ def main():
     vidCap = cv2.VideoCapture(0)
 
     while True:
-        success, img = vidCap.read()
+        _, img = vidCap.read()
         RGB_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = hands.process(RGB_image)
-        multiLandMarks = results.multi_hand_landmarks
+        multiLandmarks = results.multi_hand_landmarks
 
-        if multiLandMarks:
-            handList = getHandCoords(multiLandMarks, img)
+        if multiLandmarks:
+            handList = getHandCoords(multiLandmarks, img)
 
             """tip of index: 8 if 1 hand / 29 & 8 if 2 hands
             base of index: 5 if 1 hand / 26 & 5 if 2 hands"""
