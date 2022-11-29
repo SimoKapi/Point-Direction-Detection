@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import numpy
 
 mp_Hands = mp.solutions.hands
 hands = mp_Hands.Hands()
@@ -11,14 +12,11 @@ thumb_coord = (4, 2)
 def getHandCoords(multiLandMarks, img):
     handList = []
     for handLms in multiLandMarks:
-        mpDraw.draw_landmarks(img, handLms, mp_Hands.HAND_CONNECTIONS)
+        #mpDraw.draw_landmarks(img, handLms, mp_Hands.HAND_CONNECTIONS)
         for idx, lm in enumerate(handLms.landmark):
             h, w, c = img.shape
             cx, cy = int(lm.x * w), int(lm.y * h)
             handList.append((cx, cy))
-
-    for point in handList:
-        cv2.circle(img, point, 10, (255, 0, 0), cv2.FILLED)
     
     return handList
 
@@ -46,15 +44,40 @@ def main():
         if multiLandMarks:
             handList = getHandCoords(multiLandMarks, img)
 
-            for point in handList:
+            #tip of index: 8 if 1 hand / 29 & 8 if 2 hands
+            #base of index: 5 if 1 hand / 26 & 5 if 2 hands
+            """for point in handList:
                 cv2.circle(img, point, 10, (255, 0, 0), cv2.FILLED)
+                cv2.putText(img, str(handList.index(point)), point, cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1)"""
+            #cv2.circle(img, handList[8], 10, (255, 0, 0), cv2.FILLED)
 
-            upCount = countFingers(handList)
+            indexBase = 5
+            indexTip = 8
+            pointSet = []
 
-            cv2.putText(img, str(upCount), (150, 150), cv2.FONT_HERSHEY_PLAIN, 12, (0, 255, 0), 12)
+            #Get points of all knuckles on index finger
+            for i in range(indexBase, indexTip + 1):
+                #cv2.circle(img, handList[i], 10, (255, 0, 0), cv2.FILLED)
+                pointSet.append(handList[i])
 
-        cv2.imshow("# of fingers:", img)
-        cv2.waitKey(1)
+            #Calculate list of all xs and ys in pointSet
+            xs = []
+            ys = []
+            for tup in pointSet:
+                xs.append(tup[0])
+                ys.append(tup[1])
+
+            #Get average point from each knuckle on index finger
+            avPoint = (int(sum(xs)/len(xs)), int(sum(ys)/len(ys)))
+
+            #Calculate direction of two points
+            direction = numpy.subtract(avPoint, handList[indexBase])
+            cv2.putText(img, str(direction), handList[indexBase], cv2.FONT_HERSHEY_PLAIN, 2, (185, 232, 255), 2)
+
+            cv2.line(img, handList[indexBase], handList[indexBase] + (direction * 5), (185, 232, 255), 3)
+
+        cv2.imshow("Direction view:", img)
+        cv2.waitKey(30)
 
 if __name__ == "__main__":
     main()
