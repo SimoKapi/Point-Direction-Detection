@@ -56,9 +56,6 @@ def main():
 
             #numKnuck is the number of knuckles detected on each hand
             numKnuck = 21
-            print(len(handList))
-            print(len(handList)/numKnuck)
-            print(int(len(handList)/numKnuck))
             handCount = int(len(handList)/numKnuck)
 
             """Runs loop for each hand, drawing direction on each hand individually"""
